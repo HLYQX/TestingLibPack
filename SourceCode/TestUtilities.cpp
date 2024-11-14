@@ -35,7 +35,7 @@ void test_coutFloat()
 	/// std::noshowbase结束输出进制前缀
 	cout << std::noshowbase;
 	/// 变回十进制
-	cout << std::defaultfloat;
+	cout << std::dec << std::defaultfloat;
 }
 
 void test_coutText()
@@ -226,10 +226,102 @@ void test_pInV()
 		clkend = clock();
 		cout << std::right << std::setw(50) << "Column full rank LS Elapsed time: " << std::setw(10) << ((double)clkend - (double)clkstart) / CLOCKS_PER_SEC * 1000 << " ms";
 		printBoolWithColor(Result_jacobiSvd.isApprox(Result, Pec));
-
+		
 
 		Sleep(2000);
 	}
 
+}
+
+void test_map()
+{
+	/// 打印块信息
+	printBlockInfo("test_map()");
+	
+	/// 大写字母表map
+	map <int, char> UpperCaseAlphabetASCII;
+	for (int i = 0; i < 26; i++)
+	{	
+		/// 插入方式
+		//UpperCaseAlphabetASCII.insert(pair<int, char>(65 + i, 65 + i));
+		//UpperCaseAlphabetASCII.insert({ 65 + i, 65 + i });
+		UpperCaseAlphabetASCII[65 + i] = 65 + i;
+	}
+
+	cout << setw(12) << "No. ";
+	for (int i = 1; i <= 26; i++)
+	{
+		cout << setw(3) << i << ' ';
+	}
+
+	cout << endl << setw(12) << "ASCII: ";
+	for (auto& it : UpperCaseAlphabetASCII)
+	{
+		cout << setw(3) << it.first << ' ';
+	}
+	cout << endl << setw(12) << "Alphabet: ";
+	for (auto& it : UpperCaseAlphabetASCII)
+	{
+		cout << setw(3) << it.second << ' ';
+	}
+
+	/// 小写字母表map
+	map <int, char> LowerCaseAlphabetASCII;
+	for (int i = 0; i < 26; i++)
+	{
+		LowerCaseAlphabetASCII.insert({ 65 + 32 + i, 65 + 32 + i });
+	}
+	cout << endl << setw(12) << "ASCII: ";
+	for (auto& it : LowerCaseAlphabetASCII)
+	{
+		cout << setw(3) << it.first << ' ';
+	}
+	cout << endl << setw(12) << "Alphabet: ";
+	for (auto& it : LowerCaseAlphabetASCII)
+	{
+		cout << setw(3) << it.second << ' ';
+	}
+	cout << endl;
+
+	/// 直接按索引取值:如打印Hello World
+	cout << UpperCaseAlphabetASCII[72];		///<'H'
+	cout << LowerCaseAlphabetASCII[101];	///<'e'
+	cout << LowerCaseAlphabetASCII[108];	///<'l'
+	cout << LowerCaseAlphabetASCII[108];	///<'l'
+	cout << LowerCaseAlphabetASCII[111];	///<'o'
+	cout << ' ';
+	cout << LowerCaseAlphabetASCII[119];	///<'w'
+	cout << LowerCaseAlphabetASCII[111];	///<'o'
+	cout << LowerCaseAlphabetASCII[114];	///<'r'
+	cout << LowerCaseAlphabetASCII[108];	///<'l'
+	cout << LowerCaseAlphabetASCII[100];	///<'d'
+	cout << endl;
+
+	/// 修改和计数
+	/// 直接通过索引修改
+	UpperCaseAlphabetASCII[65] = 'a';
+	LowerCaseAlphabetASCII[97] = 'A';
+	/// 由于键值对唯一对应，又是查找key，只能返回0或1
+	cout << UpperCaseAlphabetASCII.count(65) << endl;
+	cout << UpperCaseAlphabetASCII.count(97) << endl;
+
+	/// 查找、删除和清空
+
+	/// 定义迭代器对象，查找key值并删除
+	map<int, char>::iterator it;
+	it = UpperCaseAlphabetASCII.find(65);
+	cout << it->first << ' ' << it->second << endl;
+	UpperCaseAlphabetASCII.erase(it);
+	/// 简略版
+	UpperCaseAlphabetASCII.erase(UpperCaseAlphabetASCII.find(66));
+	UpperCaseAlphabetASCII.erase(UpperCaseAlphabetASCII.find(67));
+
+	/// 删除了a，b，c
+	LowerCaseAlphabetASCII.erase(LowerCaseAlphabetASCII.find(97));
+	LowerCaseAlphabetASCII.erase(LowerCaseAlphabetASCII.find(98));
+	LowerCaseAlphabetASCII.erase(LowerCaseAlphabetASCII.find(99));
+
+	UpperCaseAlphabetASCII.clear();
+	LowerCaseAlphabetASCII.clear();
 }
 

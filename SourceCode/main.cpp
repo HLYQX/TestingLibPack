@@ -7,28 +7,12 @@
 
 void main()
 {
-	test_coutFloat();
-	test_coutText();
-	test_clock();
-	test_pInV();
+	//test_coutFloat();
+	//test_coutText();
+	//test_clock();
+	//test_pInV();
+	//test_map();
 	
-	//C++map
-	cout << "C++map" << endl;
-	map <int, char> Alphabet;
-	int Key[26] = {};
-	char Value[26] = {};
-	for (int i = 0; i < 26; i++)
-	{
-		Key[i] = i;
-		Value[i] = 65 + i;
-		//cout << Key[i] << '\t' << Value[i] << endl;
-		Alphabet.insert(pair<int, char>(Key[i], Value[i]));
-	}
-	for (auto& it : Alphabet)
-	{
-		cout << it.first << ' ' << it.second << endl;
-	}
-
 	// C++写HDF5
 	cout << "C++写 HDF5" << endl;
 	MatrixXi TestEigenRand(2, 3);

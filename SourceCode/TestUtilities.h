@@ -23,5 +23,9 @@ void test_clock();
 */
 void test_pInV();
 
+/**
+* @brief 测试map容器
+*/
+void test_map();
 
 #endif

@@ -32,4 +32,9 @@ void test_map();
 * @brief 测试Eigen3.4.0
 */
 void test_Eigen340();
+
+/**
+* @brief 测试transformStorageOrder函数
+*/
+void test_transformStorageOrder();
 #endif

@@ -112,3 +112,18 @@ void printBlockInfo(const string& BlockName)
 	cout << setw(20) << setfill('=') << std::left << BlockName;
 	cout << setw(20) << setfill('=') << '=' << setfill(' ') << endl;
 }
+
+
+Matrix<double, Dynamic, Dynamic, Eigen::RowMajor> transformStorageOrder(const MatrixXd& A)
+{
+	if (A.IsRowMajor)
+	{
+		cout << endl << "The Matrix is already Row-Major!" << endl;
+		return A;
+	}
+	else 
+	{
+		Matrix<double, Dynamic, Dynamic, Eigen::RowMajor>B = A; ///< 看起来此函数无意义，只要现场写一句类似此句的代码便可
+		return B;
+	}
+}

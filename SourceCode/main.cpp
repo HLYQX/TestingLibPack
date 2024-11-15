@@ -13,6 +13,7 @@ void main()
 	//test_pInV();
 	//test_map();
 	//test_Eigen340();
+	//test_transformStorageOrder();
 	
 	// C++写HDF5
 	cout << "C++写 HDF5" << endl;
@@ -126,13 +127,6 @@ void main()
 	TestpInvd.setZero();
 	
 
-
-	/*
-	//system("pause");
-	*/
-
-
-	
 	//SetConsoleCP(65001);
 	qDebug() << QString("给个第三方") << endl;
 	qDebug() << QString("给个第三方").toUtf8() << endl;

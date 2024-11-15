@@ -458,3 +458,28 @@ void test_Eigen340()
 	cout << endl;
 }
 
+void test_transformStorageOrder()
+{
+	MatrixXd A(4, 5);
+	for (auto& x : A.rowwise()) 
+	{
+		x.setLinSpaced(5, 0, 8);
+	}
+	cout << "Matrix A:\n" << A << endl;
+
+	/// Eigen默认列优先
+	cout << "Matrix A in Col-Major:\n";
+	for (int i = 0; i < A.size(); i++)
+	{
+		cout << *(A.data() + i) << "  ";
+	}
+	Matrix<double, Dynamic, Dynamic, Eigen::RowMajor> B = transformStorageOrder(A);
+	//MatrixXd B = transformStorageOrder(A);
+	cout << endl << "Matrix A in Row-Major:\n";
+	for (int i = 0; i < B.size(); i++)
+	{
+		cout << *(B.data() + i) << "  ";
+	}
+	cout << endl;
+}
+

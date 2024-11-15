@@ -12,6 +12,7 @@ void main()
 	//test_clock();
 	//test_pInV();
 	//test_map();
+	//test_Eigen340();
 	
 	// C++写HDF5
 	cout << "C++写 HDF5" << endl;
@@ -131,47 +132,7 @@ void main()
 	*/
 
 
-	//Eigen 3.40
-	MatrixXd Aa = MatrixXd::Zero(20, 20);
-	Aa.diagonal().setLinSpaced(0, 20 - 1);
-	Aa(0, all).setLinSpaced(0, 20 - 1);
-	Aa(all, 0).setLinSpaced(0, 20 - 1);
-	cout << "Aa\n" << Aa << endl;
-	cout << "Aa(seqN(1, 5), {1,2,3,4,5})\n" << Aa(seqN(1, 5), { 1,2,3,4,5 }) << endl;
-	cout << "Aa(seq(1, 5), {1,2,3,4,5})\n" << Aa(seq(1, 5), { 1,2,3,4,5 }) << endl;
-	cout << "Aa(seq(5, 1, -1), { 5,4,3,2,1 })\n" << Aa(seq(5, 1, -1), { 5,4,3,2,1 }) << endl;
-	cout << "Aa(seq(5, 1, -1), seq(5, 1, -1))\n" << Aa(seq(5, 1, -1), seq(5, 1, -1)) << endl;
-	cout << "Aa(seq(5, 1, -1).reverse(), seq(5, 1, -1).reverse())\n" << Aa(seq(5, 1, -1).reverse(), seq(5, 1, -1).reverse()) << endl;
-	cout << "Aa({ 5,4,3,2,1 }, { 5,4,3,2,1 })\n" << Aa({ 5,4,3,2,1 }, { 5,4,3,2,1 }) << endl;
-	cout << "Aa(seqN(1, 3, 2), { 1,3,5 })\n" << Aa(seqN(1, 3, 2), { 1,3,5 }) << endl;
-	cout << "Aa(seq(1, 5, 2), { 1,3,5 })\n" << Aa(seq(1, 5, 2), { 1,3,5 }) << endl;
-	cout << "Aa(all, last/2)\n" << Aa(all, last / 2) << endl;
-	cout << "Aa(all, lastN(2))\n" << Aa(all, lastN(2)) << endl;
-	cout << "Aa(all, lastN(5,2))\n" << Aa(all, lastN(5,2)) << endl;
-	cout << "VectorXd::Unit(20, 5)\n" << VectorXd::Unit(20, 5) << endl;
-
-	MatrixXd A(10, 5);               //  10x5  matrix.
-	A.setConstant(NoChange, 10, 2);  //  10x10 matrix of 2s.
-	cout << A << endl;
-	A.setConstant(5, NoChange, 3);   //  5x10 matrix of 3s.
-	A.setZero(NoChange, 20);         //  5x20 matrix of 0s.
-	A.setZero(20, NoChange);         //  20x20 matrix of 0s.
-	A.setOnes(NoChange, 5);          //  20x5  matrix of 1s.
-	A.setOnes(5, NoChange);          //  5x5  matrix of 1s.
-	A.setRandom(NoChange, 10);       //  5x10 random matrix.
-	A.setRandom(10, NoChange);       //  10x10 random matrix.
-	cout << A << endl;
-	for (auto& x : A.rowwise()) { 
-		int IndexMax;
-		x.maxCoeff(&IndexMax);
-		x = x.sum() * VectorXd::Unit(10, IndexMax);
-	}
-	cout << A << endl;
-
-	for (auto x : VectorXd::Unit(20, 5)) {
-		cout << x << " ";
-	}
-	cout << endl;
+	
 	//SetConsoleCP(65001);
 	qDebug() << QString("给个第三方") << endl;
 	qDebug() << QString("给个第三方").toUtf8() << endl;

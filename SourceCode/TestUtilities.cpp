@@ -226,7 +226,7 @@ void test_pInV()
 		clkend = clock();
 		cout << std::right << std::setw(50) << "Column full rank LS Elapsed time: " << std::setw(10) << ((double)clkend - (double)clkstart) / CLOCKS_PER_SEC * 1000 << " ms";
 		printBoolWithColor(Result_jacobiSvd.isApprox(Result, Pec));
-		
+
 
 		Sleep(2000);
 	}
@@ -237,11 +237,11 @@ void test_map()
 {
 	/// 打印块信息
 	printBlockInfo("test_map()");
-	
+
 	/// 大写字母表map
 	map <int, char> UpperCaseAlphabetASCII;
 	for (int i = 0; i < 26; i++)
-	{	
+	{
 		/// 插入方式
 		//UpperCaseAlphabetASCII.insert(pair<int, char>(65 + i, 65 + i));
 		//UpperCaseAlphabetASCII.insert({ 65 + i, 65 + i });
@@ -323,5 +323,138 @@ void test_map()
 
 	UpperCaseAlphabetASCII.clear();
 	LowerCaseAlphabetASCII.clear();
+}
+
+void test_Eigen340()
+{
+	///打印块信息
+	printBlockInfo("test_Eigen340()");
+
+	///asDiagonal()
+	cout << Matrix3i(Vector3i::LinSpaced(1,3).asDiagonal()) << endl;
+
+	/// Matlab风格的切片
+	MatrixXd Aa = MatrixXd::Zero(20, 20);
+	/// 改写对角线元素
+	Aa.diagonal().setLinSpaced(0, 20 - 1);
+	/// all相当于Matlab的1:end运算符
+	Aa(0, all).setLinSpaced(0, 20 - 1);
+	Aa(all, 0).setLinSpaced(0, 20 - 1);
+	cout << "Aa\n" << Aa << endl;
+
+	/// 利用seq函数生成序列或直接用int[]
+	/// seqN(StartIndex,Size)
+	cout << "Aa(seqN(1, 5), {1,2,3,4,5})\n" << Aa(seqN(1, 5), { 1,2,3,4,5 }) << endl;
+	/// seq(StartIndex,EndIndex)
+	cout << "Aa(seq(1, 5), {1,2,3,4,5})\n" << Aa(seq(1, 5), { 1,2,3,4,5 }) << endl;
+	/// seq(StartIndex,EndIndex,Step)
+	cout << "Aa(seq(5, 1, -1), { 5,4,3,2,1 })\n" << Aa(seq(5, 1, -1), { 5,4,3,2,1 }) << endl;
+	cout << "Aa(seq(5, 1, -1), seq(5, 1, -1))\n" << Aa(seq(5, 1, -1), seq(5, 1, -1)) << endl;
+	cout << "Aa(seq(5, 1, -1).reverse(), seq(5, 1, -1).reverse())\n" << Aa(seq(5, 1, -1).reverse(), seq(5, 1, -1).reverse()) << endl;
+	cout << "Aa(seqN(5, 5, -1), seqN(5, 5, -1))\n" << Aa(seqN(5, 5, -1), seqN(5, 5, -1)) << endl;
+	cout << "Aa({ 5,4,3,2,1 }, { 5,4,3,2,1 })\n" << Aa({ 5,4,3,2,1 }, { 5,4,3,2,1 }) << endl;
+	/// seqN(StartIndex,Size,Step)
+	cout << "Aa(seqN(1, 3, 2), { 1,3,5 })\n" << Aa(seqN(1, 3, 2), { 1,3,5 }) << endl;
+	cout << "Aa(seq(1, 5, 2), { 1,3,5 })\n" << Aa(seq(1, 5, 2), { 1,3,5 }) << endl;
+	/// last相当于Matlab的end
+	cout << "Aa(all, last/2)\n" << Aa(all, last / 2) << endl;
+	/// lastN(Size)
+	cout << "Aa(all, lastN(2))\n" << Aa(all, lastN(2)) << endl;
+	/// lastN(Size,Step)相当于seqN(last,Size,-Step).reverse()
+	cout << "Aa(all, lastN(5,2))\n" << Aa(all, lastN(5, 2)) << endl;
+	cout << "Aa(all, seqN(last, 5, -2).reverse())\n" << Aa(all, seqN(last, 5, -2).reverse()) << endl;
+
+	/// 设置基向量的两种方式（静态成员函数或普通成员函数）
+	cout << "VectorXd::Unit(20, 5).transpose()\n" << VectorXd::Unit(20, 5).transpose() << endl;
+	VectorXd Bb(20);
+	cout << "Bb.setUnit(5).transpose()\n" << Bb.setUnit(5).transpose() << endl;
+
+	/// 可用NoChange变量只改变矩阵的某一维度
+	MatrixXd A(10, 5);               //  10x5  matrix.
+	A.setConstant(NoChange, 10, 2);  //  10x10 matrix of 2s.
+	cout << A << endl;
+	A.setConstant(5, NoChange, 3);   //  5x10 matrix of 3s.
+	A.setZero(NoChange, 20);         //  5x20 matrix of 0s.
+	A.setZero(20, NoChange);         //  20x20 matrix of 0s.
+	A.setOnes(NoChange, 5);          //  20x5  matrix of 1s.
+	A.setOnes(5, NoChange);          //  5x5  matrix of 1s.
+	A.setRandom(NoChange, 10);       //  5x10 random matrix.
+	A.setRandom(10, NoChange);       //  10x10 random matrix.
+
+	/// Eigen::format
+	/// 先设置IOFormat(两种方式)，参数列表：
+	/// precision 		-number of digits for floating point values, or one of the special constants StreamPrecision and FullPrecision. The default is the special value StreamPrecision which means to use the stream's own precision setting, as set for instance using cout.precision(3). The other special value FullPrecision means that the number of digits will be computed to match the full precision of each floating-point type.
+	/// flags 			-combination of flags, the default value is 0, the only currently available flag is DontAlignCols which allows to disable the alignment of columns, resulting in faster code.
+	///	coeffSeparator	-string printed between two coefficients of the same row
+	///	rowSeparator	-string printed between two rows
+	///	rowPrefix		-string printed at the beginning of each row
+	///	rowSuffix		-string printed at the end of each row
+	///	matPrefix		-string printed at the beginning of the matrix
+	///	matSuffix		-string printed at the end of the matrix
+	///	fill			-character printed to fill the empty space in aligned columns
+	IOFormat UserDefineFormat1;
+	UserDefineFormat1.precision = 3;
+	UserDefineFormat1.flags = 0;
+	UserDefineFormat1.coeffSeparator = ",";
+	UserDefineFormat1.rowSeparator = ";\n";
+	UserDefineFormat1.rowPrefix = "\t[";
+	UserDefineFormat1.rowSuffix = "]";
+	UserDefineFormat1.matPrefix = "{";
+	UserDefineFormat1.matSuffix = "\t}";
+	UserDefineFormat1.fill = '0';
+	IOFormat UserDefineFormat2(FullPrecision, 0, ", ", ";\n", "[", "]", "{", "}", '*');
+	cout << std::showpos << A.format(UserDefineFormat1) << std::noshowpos << endl;
+
+	/// Eigen取最大值及所在索引
+	int IndexMaxRow, IndexMaxCol;
+	double MaxValueA = A.maxCoeff(&IndexMaxRow, &IndexMaxCol);
+
+	/// Eigen的行、列迭代器
+	for (auto& x : A.rowwise()) {
+		int IndexMax;
+		x.maxCoeff(&IndexMax);
+		x = VectorXd::Unit(10, IndexMax) * x.sum();
+	}
+	cout << A << endl;
+
+	/// 对列阵来说是按元素迭代
+	for (auto x : VectorXi::Unit(20, 5)) {
+		cout << x << " ";
+	}
+	cout << endl;
+
+	/// cwise按元素
+	MatrixXd Acwise(5, 5);
+	Acwise.setConstant(3);
+	/// 按元素取倒数
+	cout << Acwise.cwiseInverse() << endl;
+	/// 按元素开方
+	cout << Acwise.cwiseSqrt() << endl;
+	/// 按元素取符号
+	cout << Acwise.cwiseSign() << endl;
+
+	Acwise.setConstant(-0.5);
+	/// 按元素取绝对值
+	cout << Acwise.cwiseAbs() << endl;
+	/// 按元素取绝对值的平方
+	cout << Acwise.cwiseAbs2() << endl;
+	/// 按元素乘
+	cout << Acwise.cwiseProduct(MatrixXd::Constant(5, 5, 10)) << endl;
+	/// 按元素除以
+	cout << Acwise.cwiseQuotient(MatrixXd::Constant(5, 5, 10)) << endl;
+	/// 按元素等于
+	cout << Acwise.cwiseEqual(MatrixXd::Constant(5, 5, 10)) << endl;
+	/// 按元素不等于
+	cout << Acwise.cwiseNotEqual(MatrixXd::Constant(5, 5, 10)) << endl;
+	/// 按元素取最大
+	cout << Acwise.cwiseMax(MatrixXd::Constant(5, 5, 10)) << endl;
+	/// 按元素取最小
+	cout << Acwise.cwiseMin(MatrixXd::Constant(5, 5, 10)) << endl;
+	/// 按元素取复数幅角
+	/// 定义一个1+tan(1.5)*i的复数
+	std::complex<double> ComplexNum(1.0, tan(1.5));
+	cout << MatrixXcd::Constant(4, 4, ComplexNum).cwiseArg() << endl;// 返回的弧度值，应为1.5
+	cout << endl;
+	cout << endl;
 }
 

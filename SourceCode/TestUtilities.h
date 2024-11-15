@@ -28,4 +28,8 @@ void test_pInV();
 */
 void test_map();
 
+/**
+* @brief 测试Eigen3.4.0
+*/
+void test_Eigen340();
 #endif

@@ -37,4 +37,14 @@ void test_Eigen340();
 * @brief 测试transformStorageOrder函数
 */
 void test_transformStorageOrder();
+
+/**
+* @brief 测试cpp写H5文件
+*/
+void test_HDF5Write();
+
+/**
+* @brief 测试cpp读H5文件
+*/
+void test_HDF5Read();
 #endif

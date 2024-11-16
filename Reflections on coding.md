@@ -10,8 +10,8 @@ for( auto& x : A ) { ; }
 对于类而言，要提供begin和end的方法，begin和end就是for循环的范围
 ## 1.3 行列优先
 * Eigen默认列优先
-* HDF5默认“行”优先
+* HDF5默认“行”优先（按初始化`DataSpace`时写入`hsize_t`中的维度顺序排序）
 * Matlab读入cpp写入的H5文件时会把维度顺序取反
-    eg: cpp写入的维度顺序为`[X Y Time]`, Matlab读入的数组却为`[Time Y X]`, 可用`permute`函数对维度顺序进行调整。
+    eg: cpp写入的维度顺序为`[X Y Time]`, Matlab读入的数组却为`[Time Y X]`, 可用`permute`函数对维度顺序进行调整。特别地，对矩阵可以采取转置的办法。
 # 2 问题
 ## 2.1 看起来一个inline函数的声明和定义不能在不同cpp里

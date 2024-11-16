@@ -331,7 +331,7 @@ void test_Eigen340()
 	printBlockInfo("test_Eigen340()");
 
 	///asDiagonal()
-	cout << Matrix3i(Vector3i::LinSpaced(1,3).asDiagonal()) << endl;
+	cout << Matrix3i(Vector3i::LinSpaced(1, 3).asDiagonal()) << endl;
 
 	/// Matlab风格的切片
 	MatrixXd Aa = MatrixXd::Zero(20, 20);
@@ -464,7 +464,7 @@ void test_transformStorageOrder()
 	printBlockInfo("test_transformStorageOrder()");
 
 	MatrixXd A(4, 5);
-	for (auto& x : A.rowwise()) 
+	for (auto& x : A.rowwise())
 	{
 		x.setLinSpaced(5, 0, 8);
 	}
@@ -488,22 +488,22 @@ void test_transformStorageOrder()
 
 void test_HDF5WriteCppArray()
 {
-	///打印块信息
+	/// 打印块信息
 	printBlockInfo("test_HDF5WriteCppArray()");
 
 	/// c++多维数组写入(四维数组，空间三维+时间一维，其中存放某一物理量的值)
-	const int DimX = 32;
-	const int DimY = 16;
-	const int DimZ = 5;
-	const int DimTimeStep = 10;
+	const int DimX = 6;
+	const int DimY = 5;
+	const int DimZ = 4;
+	const int DimTimeStep = 3;
 	const int NumDims = 4; ///< 共有4维
 	double DataWriteDim4[DimX][DimY][DimZ][DimTimeStep] = {};
-	for (int x = 0; x < DimX;x++) {
-		for (int y = 0; y < DimY; y++) {
-			for (int z = 0; z < DimZ; z++) {
-				for (int TimeStep = 0; TimeStep < DimTimeStep; TimeStep++)
-				{
-					DataWriteDim4[x][y][z][TimeStep] = 256 * (TimeStep / DimTimeStep);
+	for (int TimeStep = 0; TimeStep < DimTimeStep; TimeStep++) {
+		for (int x = 0; x < DimX; x++) {
+			for (int y = 0; y < DimY; y++) {
+				for (int z = 0; z < DimZ; z++) {
+					/// 存入数据的小数点前为帧数，小数点后依次为x、y、z坐标
+					DataWriteDim4[x][y][z][TimeStep] = TimeStep * 1E0 + x * 1E-1 + y * 1E-2 + z * 1E-3;
 				}
 			}
 		}
@@ -511,11 +511,11 @@ void test_HDF5WriteCppArray()
 
 	/// c++多维数组写入(三维数组，平面二维+时间一维，其中存放某一物理量的值)
 	double DataWriteDim3[DimX][DimY][DimTimeStep] = {};
-	for (int x = 0; x < DimX; x++) {
-		for (int y = 0; y < DimY; y++) {
-			for (int TimeStep = 0; TimeStep < DimTimeStep; TimeStep++)
-			{
-				DataWriteDim3[x][y][TimeStep] = x + y + 10 * TimeStep;
+	for (int TimeStep = 0; TimeStep < DimTimeStep; TimeStep++) {
+		for (int x = 0; x < DimX; x++) {
+			for (int y = 0; y < DimY; y++) {
+				/// 存入数据的小数点前为帧数，小数点后依次为x、y坐标
+				DataWriteDim3[x][y][TimeStep] = TimeStep * 1E0 + x * 1E-1 + y * 1E-2;
 			}
 		}
 	}
@@ -531,7 +531,7 @@ void test_HDF5WriteCppArray()
 	/// 在一个Gruop下面可以再创建一个Group
 	H5GroupDim4 = H5GroupDim4.createGroup("DataDim4");
 	H5GroupDim3 = H5GroupDim3.createGroup("DataDim3");
-	
+
 	/// 定义一个hsize_t数组，存放各维度的数据的个数，NumDims即为数据块的Rank
 	hsize_t H5Dims4[NumDims] = { DimX,DimY,DimZ,DimTimeStep }; ///< DataSpace共有4个维度
 	/*
@@ -546,7 +546,7 @@ void test_HDF5WriteCppArray()
 	/// 第二个参数是hsize_t数组的头指针
 	DataSpace H5DataSpaceDim4(NumDims, H5Dims4);
 	DataSpace H5DataSpaceDim3(NumDims - 1, H5Dims3);
-	
+
 	/// 定义数据类型
 	DataType H5DataType(PredType::NATIVE_DOUBLE);
 	/// 可选是否定义（Double存储的大小端）
@@ -567,20 +567,26 @@ void test_HDF5WriteCppArray()
 
 void test_HDF5WriteMatrixXd()
 {
-	///打印块信息
+	/// 打印块信息
 	printBlockInfo("test_HDF5WriteMatrixXd()");
-	
+
 	/// 维度信息
-	const int DimX = 3;
-	const int DimY = 2;
+	const int DimX = 4;
+	const int DimY = 3;
 	const int NumDims = 2; ///< 共有2维
-	const int DimTimeStep = 5;
+	const int DimTimeStep = 2;
 
 	/// MatrixXd,按时间帧写入
-	vector<MatrixXd> MatricsSequence(DimTimeStep);
+	vector<MatrixXd> MatricsColMajorSequence(DimTimeStep);
 	for (int TimeStep = 0; TimeStep < DimTimeStep; TimeStep++) {
-		MatricsSequence[TimeStep].setZero(DimX * TimeStep + 1, DimY * TimeStep + 1);
-		MatricsSequence[TimeStep];
+		/// 第0帧矩阵维度1*1，第1帧(4+1)*(3+1)
+		MatricsColMajorSequence[TimeStep].setZero(DimX * TimeStep + 1, DimY * TimeStep + 1);
+		for (int x = 0; x < DimX * TimeStep + 1; x++) {
+			for (int y = 0; y < DimY * TimeStep + 1; y++) {
+				/// 存入数据的小数点前为帧数，小数点后依次为x、y坐标
+				MatricsColMajorSequence[TimeStep](x, y) = TimeStep * 1E0 + x * 1E-1 + y * 1E-2;
+			}
+		}
 	}
 
 	/// H5文件名
@@ -589,8 +595,8 @@ void test_HDF5WriteMatrixXd()
 	H5File H5FileWrite(H5FileName, H5F_ACC_TRUNC);
 
 	/// 创建Group
-	Group H5GroupMatrics = H5FileWrite.createGroup("Group4Matrics");
-	H5GroupMatrics = H5GroupMatrics.createGroup("MatricsSequence");
+	Group H5GroupMatrics = H5FileWrite.createGroup("Group4MatricsColMajorSequence");
+	H5GroupMatrics = H5GroupMatrics.createGroup("MatricsColMajorSequence");
 
 	/// 定义数据类型
 	DataType H5DataType(PredType::NATIVE_DOUBLE);
@@ -598,6 +604,7 @@ void test_HDF5WriteMatrixXd()
 	/// 定义DataSpace
 	vector<DataSpace> H5DataSpaces(DimTimeStep);
 	for (int TimeStep = 0; TimeStep < DimTimeStep; TimeStep++) {
+		/// 第0帧维度1*1，第1帧(4+1)*(3+1)，第2帧(8+1)*(6+1)...
 		hsize_t H5Dims[NumDims] = { DimX * TimeStep + 1,DimY * TimeStep + 1 };
 		H5DataSpaces[TimeStep] = DataSpace(NumDims, H5Dims);
 	}
@@ -611,14 +618,43 @@ void test_HDF5WriteMatrixXd()
 
 	/// 写入数据
 	for (int TimeStep = 0; TimeStep < DimTimeStep; TimeStep++) {
-		H5DataSets[TimeStep].write(MatricsSequence[TimeStep].data(), H5DataType);
+		H5DataSets[TimeStep].write(MatricsColMajorSequence[TimeStep].transpose().data(), H5DataType);
 	}
+
+	/// 观察输出文件发现H5“行”优先，而Eigen::MatrixXd默认列优先，因此存入的顺序是不对的，需要先调整Eigen的存储顺序为行优先再向H5中存
+	/// 行优先矩阵序列
+	vector<Matrix<double, Dynamic, Dynamic, Eigen::RowMajor>> MatricsRowMajorSequence(DimTimeStep);
+	/// 把容器中列优先的矩阵转储成行优先
+	for (int TimeStep = 0; TimeStep < DimTimeStep; TimeStep++) {
+		MatricsRowMajorSequence[TimeStep] = MatricsColMajorSequence[TimeStep];
+	}
+
+	/// 创建Group
+	H5GroupMatrics = H5FileWrite.createGroup("Group4MatricsRowMajorSequence");
+	H5GroupMatrics = H5GroupMatrics.createGroup("MatricsRowMajorSequence");
+
+	/// 定义DataSet
+	for (int TimeStep = 0; TimeStep < DimTimeStep; TimeStep++) {
+		string DataSetName = QString::number(TimeStep).toStdString();
+		H5DataSets[TimeStep] = H5GroupMatrics.createDataSet(DataSetName, H5DataType, H5DataSpaces[TimeStep]);
+	}
+
+	/// 写入数据
+	for (int TimeStep = 0; TimeStep < DimTimeStep; TimeStep++) {
+		H5DataSets[TimeStep].write(MatricsRowMajorSequence[TimeStep].data(), H5DataType);
+	}
+
+	/// 关闭文件
+	H5FileWrite.close();
 }
 
 void test_HDF5Read()
 {
-	///打印块信息
+	/// 打印块信息
 	printBlockInfo("test_HDF5Read()");
+
+	///
+
 
 	/*
 	// C++读HDF5

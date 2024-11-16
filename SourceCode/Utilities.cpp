@@ -107,9 +107,9 @@ void printStrWithColor(const string& Str, const int& ColorForeGround, const int&
 void printBlockInfo(const string& BlockName)
 {
 	/// 打印块信息
-	cout << setw(60) << setfill('=') << '=' << endl;
+	cout << setw(80) << setfill('=') << '=' << endl;
 	cout << setw(20) << setfill('=') << '=';
-	cout << setw(20) << setfill('=') << std::left << BlockName;
+	cout << setw(40) << setfill('=') << std::left << BlockName;
 	cout << setw(20) << setfill('=') << '=' << setfill(' ') << endl;
 }
 
@@ -121,7 +121,7 @@ Matrix<double, Dynamic, Dynamic, Eigen::RowMajor> transformStorageOrder(const Ma
 		cout << endl << "The Matrix is already Row-Major!" << endl;
 		return A;
 	}
-	else 
+	else
 	{
 		Matrix<double, Dynamic, Dynamic, Eigen::RowMajor>B = A; ///< 看起来此函数无意义，只要现场写一句类似此句的代码便可
 		return B;

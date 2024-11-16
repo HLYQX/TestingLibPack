@@ -40,6 +40,6 @@ void printBlockInfo(const string& BlockName);
 * @brief Eigen矩阵存储 列优先=>行优先 转换
 * @param [A]  待转换的MatrixXd
 */
-Matrix<double,Dynamic,Dynamic,Eigen::RowMajor> transformStorageOrder(const MatrixXd& A);
+Matrix<double, Dynamic, Dynamic, Eigen::RowMajor> transformStorageOrder(const MatrixXd& A);
 
 #endif

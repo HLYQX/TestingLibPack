@@ -14,13 +14,15 @@ void main()
 	//test_map();
 	//test_Eigen340();
 	//test_transformStorageOrder();
-	test_HDF5WriteCppArray();
-	test_HDF5WriteMatrixXd();
-	test_HDF5Read();
-	
-	
+	//test_HDF5WriteCppArray();
+	//test_HDF5WriteMatrixXd();
+	//test_HDF5ReadCppArray();
+	//test_HDF5ReadEigen();
 
-	
+
+
+
+
 
 	//Test QString W
 	cout << "Test QString W" << endl;
@@ -55,7 +57,7 @@ void main()
 	//QStrRead = QTextStreamRead.readLine();
 	QStrRead = QTextStreamRead.readAll();
 	cout << QStrRead.toStdString();
-	QFileRead.close();	
+	QFileRead.close();
 
 	//SetConsoleCP(65001);
 	qDebug() << QString("给个第三方") << endl;

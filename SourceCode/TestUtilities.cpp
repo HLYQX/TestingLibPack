@@ -69,6 +69,18 @@ void test_coutText()
 	printStrWithColor("This is a test for colorful text.\n", Color::White, Color::RedBackGround);
 	printStrWithColor("This is a test for colorful text.\n", Color::Red, Color::BlackBackGround);
 	printStrWithColor("This is a test for colorful text.\n", Color::White, Color::BlueBackGround);
+
+	/// 测试\r: 简单进度条
+	for (int i = 0; i <= 100; i++)
+	{
+		cout << std::left << "\r" << std::left << "[" << std::left << i << std::left << "%";
+		cout << std::left << setw(1 + i / 2) << setfill('>') << "-";
+		Sleep(50);		///< Do something
+		if (i == 100) {
+			cout << ">]";
+		}
+	}
+	cout << endl;
 }
 
 void test_clock()
@@ -327,7 +339,7 @@ void test_map()
 
 void test_Eigen340()
 {
-	///打印块信息
+	/// 打印块信息
 	printBlockInfo("test_Eigen340()");
 
 	///asDiagonal()
@@ -460,7 +472,7 @@ void test_Eigen340()
 
 void test_transformStorageOrder()
 {
-	///打印块信息
+	/// 打印块信息
 	printBlockInfo("test_transformStorageOrder()");
 
 	MatrixXd A(4, 5);
@@ -648,29 +660,124 @@ void test_HDF5WriteMatrixXd()
 	H5FileWrite.close();
 }
 
-void test_HDF5Read()
+void test_HDF5ReadCppArray()
 {
 	/// 打印块信息
-	printBlockInfo("test_HDF5Read()");
+	printBlockInfo("test_HDF5ReadCppArray()");
 
-	///
+	/// H5文件名
+	string H5FileName = "H5FileCppArray.h5";
+	/// 创建H5文件句柄，方式选择H5F_ACC_TRUNC（仅读取）
+	H5File H5FileRead(H5FileName, H5F_ACC_RDONLY);
 
+	/// 指定要读取的Group
+	string H5GroupName = "Group4DataDim3";
+	Group H5Group = H5FileRead.openGroup(H5GroupName);
+	H5GroupName = "DataDim3";
+	H5Group = H5Group.openGroup(H5GroupName);
+	/// 指定要读取的DataSet
+	string DataSetName = "DataWriteDim3";
+	DataSet H5DataSet = H5Group.openDataSet(DataSetName);
+	/// 获取DataSpace
+	DataSpace H5DataSpace = H5DataSet.getSpace();
+	/// 定义数据类型
+	DataType H5DataType(PredType::NATIVE_DOUBLE);
+	/// 获取维度的个数
+	const int NDims = H5DataSpace.getSimpleExtentNdims();
+	cout << "The Number of Dims of the DataSet is: " << NDims << endl;
+	/// 新建一个变量用于存储各维度的数据大小
+	hsize_t* H5Dims = new hsize_t[NDims];
+	/// 得到各维度数据的大小
+	H5DataSpace.getSimpleExtentDims(H5Dims);
+	cout << "The Size of each Dim of the DataSet is: ";
+	for (int i = 0; i < NDims; i++) {
+		if (i == NDims - 1) {
+			cout << H5Dims[i];
+		}
+		else {
+			cout << H5Dims[i] << " x ";
+		}
+	}
+	cout << endl;
+	/// 建立多维数组存入数据
+	double DataReadDim3[6][5][3] = {};
 
-	/*
-	// C++读HDF5
-	cout << "C++读 HDF5" << endl;
-	H5File TestCppH5Read("Test.h5", H5F_ACC_RDONLY);
-	DataSet TestCppH5DataSet1 = TestCppH5Read.openDataSet("/RandData1");
-	TestCppH5DataSet1.read(pdata, TestCppH5DataType);
-	for (int i = 0; i < NumRow; i++)
-	{
-		for (int j = 0; j < Numcol; j++)
-		{
-			cout << pdata[i][j] << '\t';
+	/// 读取数据
+	H5DataSet.read(DataReadDim3, H5DataType);
+
+	for (int TimeStep = 0; TimeStep < H5Dims[NDims - 1]; TimeStep++) {
+		for (int x = 0; x < H5Dims[0]; x++) {
+			for (int y = 0; y < H5Dims[1]; y++) {
+				/// 存入数据的小数点前为帧数，小数点后依次为x、y坐标
+				cout << DataReadDim3[x][y][TimeStep] << "\t";
+			}
+			cout << endl;
 		}
 		cout << endl;
 	}
-	TestCppH5Read.close();
-	*/
+
+	/// 关闭文件
+	H5FileRead.close();
+}
+
+void test_HDF5ReadEigen()
+{
+	/// 打印块信息
+	printBlockInfo("test_HDF5ReadEigen()");
+
+	/// H5文件名
+	string H5FileName = "H5FileMatrics.h5";
+	/// 创建H5文件句柄，方式选择H5F_ACC_TRUNC（仅读取）
+	H5File H5FileRead(H5FileName, H5F_ACC_RDONLY);
+
+	/// 指定要读取的Group
+	string H5GroupName = "Group4MatricsRowMajorSequence";
+	Group H5Group = H5FileRead.openGroup(H5GroupName);
+	H5GroupName = "MatricsRowMajorSequence";
+	H5Group = H5Group.openGroup(H5GroupName);
+	/// 指定要读取的DataSet
+	string DataSetName = "1";
+	DataSet H5DataSet = H5Group.openDataSet(DataSetName);
+	/// 获取DataSpace
+	DataSpace H5DataSpace = H5DataSet.getSpace();
+	/// 定义数据类型
+	DataType H5DataType(PredType::NATIVE_DOUBLE);
+
+	/// 获取维度的个数
+	const int NDims = H5DataSpace.getSimpleExtentNdims();
+	cout << "The Number of Dims of the DataSet is: " << NDims << endl;
+	/// 新建一个变量用于存储各维度的数据大小
+	hsize_t* H5Dims = new hsize_t[NDims];
+	/// 得到各维度数据的大小
+	H5DataSpace.getSimpleExtentDims(H5Dims);
+	cout << "The Size of each Dim of the DataSet is: ";
+	for (int i = 0; i < NDims; i++) {
+		if (i == NDims - 1) {
+			cout << H5Dims[i];
+		}
+		else {
+			cout << H5Dims[i] << " x ";
+		}
+	}
+	cout << endl;
+	/// 建立MatrixXd存入数据
+	/// 列优先
+	MatrixXd DataReadMatrixColMajor = MatrixXd::Zero(H5Dims[0], H5Dims[1]);
+	/// 行优先
+	Matrix<double, Dynamic, Dynamic, Eigen::RowMajor> DataReadMatrixRowMajor(H5Dims[0], H5Dims[1]);
+	DataReadMatrixRowMajor.setZero();
+
+
+	/// 读取数据
+	H5DataSet.read(DataReadMatrixColMajor.data(), H5DataType);
+	H5DataSet.read(DataReadMatrixRowMajor.data(), H5DataType);
+
+	/// 输出精度3位有效数字
+	IOFormat TempFormat(3, 0, ", ", ";\n", "[", "]", "{", "}", '0');
+	cout << std::showpoint << "DataReadMatrixColMajor:\n" << DataReadMatrixColMajor.format(TempFormat) << std::noshowpoint << endl;
+	cout << std::showpoint << "DataReadMatrixRowMajor:\n" << DataReadMatrixRowMajor.format(TempFormat) << std::noshowpoint << endl;
+
+	/// 关闭文件
+	H5FileRead.close();
 }
 

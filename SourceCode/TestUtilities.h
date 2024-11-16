@@ -49,7 +49,13 @@ void test_HDF5WriteCppArray();
 void test_HDF5WriteMatrixXd();
 
 /**
-* @brief 测试cpp读H5文件
+* @brief 测试cpp读H5文件(用c++多维数组)
 */
-void test_HDF5Read();
+void test_HDF5ReadCppArray();
+
+/**
+* @brief 测试cpp读H5文件(用Eigen)
+*/
+void test_HDF5ReadEigen();
+
 #endif

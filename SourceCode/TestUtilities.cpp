@@ -486,10 +486,10 @@ void test_transformStorageOrder()
 	cout << endl;
 }
 
-void test_HDF5Write()
+void test_HDF5WriteCppArray()
 {
 	///打印块信息
-	printBlockInfo("test_HDF5Write()");
+	printBlockInfo("test_HDF5WriteCppArray()");
 
 	/// c++多维数组写入(四维数组，空间三维+时间一维，其中存放某一物理量的值)
 	const int DimX = 32;
@@ -497,40 +497,55 @@ void test_HDF5Write()
 	const int DimZ = 5;
 	const int DimTimeStep = 10;
 	const int NumDims = 4; ///< 共有4维
-	double DataWrite[DimX][DimY][DimZ][DimTimeStep] = {};
+	double DataWriteDim4[DimX][DimY][DimZ][DimTimeStep] = {};
 	for (int x = 0; x < DimX;x++) {
 		for (int y = 0; y < DimY; y++) {
 			for (int z = 0; z < DimZ; z++) {
 				for (int TimeStep = 0; TimeStep < DimTimeStep; TimeStep++)
 				{
-					DataWrite[x][y][z][TimeStep] = 256;
+					DataWriteDim4[x][y][z][TimeStep] = 256 * (TimeStep / DimTimeStep);
 				}
 			}
 		}
 	}
 
+	/// c++多维数组写入(三维数组，平面二维+时间一维，其中存放某一物理量的值)
+	double DataWriteDim3[DimX][DimY][DimTimeStep] = {};
+	for (int x = 0; x < DimX; x++) {
+		for (int y = 0; y < DimY; y++) {
+			for (int TimeStep = 0; TimeStep < DimTimeStep; TimeStep++)
+			{
+				DataWriteDim3[x][y][TimeStep] = x + y + 10 * TimeStep;
+			}
+		}
+	}
+
 	/// H5文件名
-	string H5FileName = "H5FileTest.h5";
+	string H5FileName = "H5FileCppArray.h5";
 	/// 创建H5文件，方式选择H5F_ACC_TRUNC（覆盖已有文件）
 	H5File H5FileWrite(H5FileName, H5F_ACC_TRUNC);
 
 	/// 创建H5Group
-	Group H5Group = H5FileWrite.createGroup("Group4DataDim4");
+	Group H5GroupDim4 = H5FileWrite.createGroup("Group4DataDim4");
+	Group H5GroupDim3 = H5FileWrite.createGroup("Group4DataDim3");
 	/// 在一个Gruop下面可以再创建一个Group
-	H5Group = H5Group.createGroup("DataDim4");
+	H5GroupDim4 = H5GroupDim4.createGroup("DataDim4");
+	H5GroupDim3 = H5GroupDim3.createGroup("DataDim3");
 	
 	/// 定义一个hsize_t数组，存放各维度的数据的个数，NumDims即为数据块的Rank
-	hsize_t H5Dims[NumDims] = { DimX,DimY,DimZ,DimTimeStep }; ///< DataSpace共有4个维度
+	hsize_t H5Dims4[NumDims] = { DimX,DimY,DimZ,DimTimeStep }; ///< DataSpace共有4个维度
 	/*
 	Dims[0] = DimX; ///< 第1个维度为DataWrite的x
 	Dims[1] = DimY; ///< 第2个维度为DataWrite的y
 	Dims[2] = DimZ; ///< 第3个维度为DataWrite的z
 	Dims[3] = DimTimeStep; ///< 第4个维度为DataWrite的TimeStep
 	*/
+	hsize_t H5Dims3[NumDims - 1] = { DimX,DimY,DimTimeStep }; ///< DataSpace共有3个维度
 	/// 利用hsize_t数组定义DataSpace,即为创建存储数据的DataSet做准备（定义了DataSet的大小）
 	/// 第一个参数是Rank，即hsize_t数组的长度
 	/// 第二个参数是hsize_t数组的头指针
-	DataSpace H5DataSpace(NumDims, H5Dims);
+	DataSpace H5DataSpaceDim4(NumDims, H5Dims4);
+	DataSpace H5DataSpaceDim3(NumDims - 1, H5Dims3);
 	
 	/// 定义数据类型
 	DataType H5DataType(PredType::NATIVE_DOUBLE);
@@ -539,65 +554,65 @@ void test_HDF5Write()
 
 	/// 在Group下定义DataSet
 	/// 参数列表：DataSet名称，数据类型，大小（DataSpace）
-	DataSet H5DataSet = H5Group.createDataSet("DataWrite", H5DataType, H5DataSpace);
+	DataSet H5DataSetDim4 = H5GroupDim4.createDataSet("DataWriteDim4", H5DataType, H5DataSpaceDim4);
+	DataSet H5DataSetDim3 = H5GroupDim3.createDataSet("DataWriteDim3", H5DataType, H5DataSpaceDim3);
 
 	/// 写入数据
-	H5DataSet.write(DataWrite, H5DataType);
+	H5DataSetDim4.write(DataWriteDim4, H5DataType);
+	H5DataSetDim3.write(DataWriteDim3, H5DataType);
 
 	/// 关闭文件
 	H5FileWrite.close();
+}
+
+void test_HDF5WriteMatrixXd()
+{
+	///打印块信息
+	printBlockInfo("test_HDF5WriteMatrixXd()");
 	
-	
-	
-	Matrix2d A;
+	/// 维度信息
+	const int DimX = 3;
+	const int DimY = 2;
+	const int NumDims = 2; ///< 共有2维
+	const int DimTimeStep = 5;
 
-
-	/*
-	MatrixXi TestEigenRand(2, 3);
-	//TestEigenRand.setRandom();
-	TestEigenRand << 50, 40, 30,
-		25, 26, 24;
-	ofstream a("TestEigenRand.txt");
-	a << TestEigenRand << endl;
-	a.close();
-
-	const int NumRow = TestEigenRand.rows();
-	const int Numcol = TestEigenRand.cols();
-
-	int data[2][3];
-	int(*pdata)[3] = data;
-	for (int i = 0; i < NumRow; i++)
-	{
-		for (int j = 0; j < Numcol; j++)
-		{
-			data[i][j] = TestEigenRand(i, j);
-			cout << data[i][j] << '\t';
-		}
-		cout << endl;
+	/// MatrixXd,按时间帧写入
+	vector<MatrixXd> MatricsSequence(DimTimeStep);
+	for (int TimeStep = 0; TimeStep < DimTimeStep; TimeStep++) {
+		MatricsSequence[TimeStep].setZero(DimX * TimeStep + 1, DimY * TimeStep + 1);
+		MatricsSequence[TimeStep];
 	}
 
-	H5File TestCppH5Write("Test.h5", H5F_ACC_TRUNC);
+	/// H5文件名
+	string H5FileName = "H5FileMatrics.h5";
+	/// 创建H5文件，方式选择H5F_ACC_TRUNC（覆盖已有文件）
+	H5File H5FileWrite(H5FileName, H5F_ACC_TRUNC);
 
-	IntType TestCppH5DataType(PredType::NATIVE_INT);
-	TestCppH5DataType.setOrder(H5T_ORDER_LE);
-	//TestCppH5DataType.setOrder(H5T_ORDER_BE);
+	/// 创建Group
+	Group H5GroupMatrics = H5FileWrite.createGroup("Group4Matrics");
+	H5GroupMatrics = H5GroupMatrics.createGroup("MatricsSequence");
 
-	hsize_t TestCppH5Dims[2];
-	TestCppH5Dims[0] = 2;
-	TestCppH5Dims[1] = 3;
-	DataSpace DataSpaceTestCppH5Write(2, TestCppH5Dims);
+	/// 定义数据类型
+	DataType H5DataType(PredType::NATIVE_DOUBLE);
 
-	Group TestCppH5Group = TestCppH5Write.createGroup("GroupRand");
-	TestCppH5Group = TestCppH5Group.createGroup("GroupRand2");
-	//加上“/”会使得DataSet创建在根目录下
-	DataSet* dset = new DataSet(TestCppH5Group.createDataSet("RandData3", TestCppH5DataType, DataSpaceTestCppH5Write));
-	DataSet TestCppH5DataSet1 = (&TestCppH5Group)->createDataSet("/RandData1", TestCppH5DataType, DataSpaceTestCppH5Write);
-	DataSet TestCppH5DataSet2 = TestCppH5Group.createDataSet("RandData2", TestCppH5DataType, DataSpaceTestCppH5Write);
-	TestCppH5DataSet1.write(pdata, PredType::NATIVE_INT);
-	TestCppH5DataSet2.write(pdata, PredType::NATIVE_INT);
-	dset->write(pdata, PredType::NATIVE_INT);
-	TestCppH5Write.close();
-	*/
+	/// 定义DataSpace
+	vector<DataSpace> H5DataSpaces(DimTimeStep);
+	for (int TimeStep = 0; TimeStep < DimTimeStep; TimeStep++) {
+		hsize_t H5Dims[NumDims] = { DimX * TimeStep + 1,DimY * TimeStep + 1 };
+		H5DataSpaces[TimeStep] = DataSpace(NumDims, H5Dims);
+	}
+
+	/// 定义DataSet
+	vector<DataSet> H5DataSets(DimTimeStep);
+	for (int TimeStep = 0; TimeStep < DimTimeStep; TimeStep++) {
+		string DataSetName = QString::number(TimeStep).toStdString();
+		H5DataSets[TimeStep] = H5GroupMatrics.createDataSet(DataSetName, H5DataType, H5DataSpaces[TimeStep]);
+	}
+
+	/// 写入数据
+	for (int TimeStep = 0; TimeStep < DimTimeStep; TimeStep++) {
+		H5DataSets[TimeStep].write(MatricsSequence[TimeStep].data(), H5DataType);
+	}
 }
 
 void test_HDF5Read()

@@ -14,7 +14,8 @@ void main()
 	//test_map();
 	//test_Eigen340();
 	//test_transformStorageOrder();
-	test_HDF5Write();
+	test_HDF5WriteCppArray();
+	test_HDF5WriteMatrixXd();
 	test_HDF5Read();
 	
 	

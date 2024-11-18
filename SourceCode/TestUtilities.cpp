@@ -108,6 +108,40 @@ void test_coutText()
 	cout << endl;
 }
 
+void test_QtReadWrite()
+{
+	/// 打印块信息
+	printBlockInfo("test_QtReadWrite()");
+
+	/// 写文件
+	QString FileNameWrite = QString("QtReadWrite") + QString(".txt");
+	QFile FileWrite(FileNameWrite);
+	FileWrite.open(QIODevice::WriteOnly);
+	QTextStream FileWriteStream(&FileWrite);///< 使输出流与文件绑定
+	FileWriteStream << "This is Std String\n";
+	FileWriteStream << QString("This is QString\n") << endl;
+	FileWrite.close();
+
+	/// 读文件
+	QString FileNameRead = QString("QtReadWrite") + QString(".txt");
+	QFile FileRead(FileNameRead);
+	FileRead.open(QIODevice::ReadOnly);
+	QTextStream FileReadStream(&FileRead); ///< 使输入流与文件绑定
+	QString TextContent;
+
+	while (!FileReadStream.atEnd())
+	{
+		TextContent = FileReadStream.readLine();
+		cout << TextContent.toStdString() << endl;
+	}
+	/// 另一种方式
+	/// TextContent = FileReadStream.readAll();
+	/// cout << TextContent.toStdString() << endl;
+
+	FileRead.close();
+
+}
+
 void test_clock()
 {
 	/// 打印块信息

@@ -19,6 +19,11 @@ void test_coutFloat();
 void test_coutText();
 
 /**
+* @brief 测试Qt读写文本
+*/
+void test_QtReadWrite();
+
+/**
 * @brief 测试clock_t计时
 */
 void test_clock();

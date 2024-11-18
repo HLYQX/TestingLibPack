@@ -10,6 +10,7 @@ int main(int argc, char* argv[])
 	//test_argInMain(argc, argv);
 	//test_coutFloat();
 	//test_coutText();
+	//test_QtReadWrite();
 	//test_clock();
 	//test_pInV();
 	//test_map();
@@ -24,44 +25,14 @@ int main(int argc, char* argv[])
 	//test_QtXmlModify();
 
 
-	//Test QString W
-	cout << "Test QString W" << endl;
-	QString QStrWrite = "QStrWrite";
-	cout << QStrWrite.toStdString() << endl;
+	/// 打印块信息
+	printBlockInfo("main()");
 
-	QFile QFileWrite("QFileWrite.txt");
-	QFileWrite.open(QFile::WriteOnly | QFile::Truncate);
-	//QFileWrite.write(QStrWrite.toLatin1());
-
-
-	QTextStream QTextStreamWrite(&QFileWrite);
-	QTextStreamWrite << QStrWrite + "20231023" << endl;
-	QTextStreamWrite << ToQString(Matrix3d::Random()) << endl;
-	//for (int i = 0; i < TestEigenRand.rows(); i++)
-	//{
-	//	for (int j = 0; j < TestEigenRand.cols(); j++)
-	//	{
-	//		QTextStreamWrite << TestEigenRand(i, j) << "\t";
-	//	}
-	//	QTextStreamWrite << endl;
-	//}
-	QFileWrite.close();
-
-	//Test QString R
-	cout << "Test QString R" << endl;
-	QFile QFileRead("QFileWrite.txt");
-	QFileRead.open(QFile::ReadOnly);
-	QTextStream QTextStreamRead(&QFileRead);
-	QString QStrRead;
-	//QTextStreamRead >> QStrRead;
-	//QStrRead = QTextStreamRead.readLine();
-	QStrRead = QTextStreamRead.readAll();
-	cout << QStrRead.toStdString();
-	QFileRead.close();
-
-	//SetConsoleCP(65001);
-	qDebug() << QString("给个第三方") << endl;
-	qDebug() << QString("给个第三方").toUtf8() << endl;
+	/// 中文输出测试
+	cout << "中文输出测试" << endl;
+	qDebug() << "中文输出测试" << endl;
+	qDebug() << QString("中文输出测试") << endl;
+	cout << QString("中文输出测试").toStdString() << endl;
 
 	return 0;
 }

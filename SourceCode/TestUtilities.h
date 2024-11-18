@@ -4,6 +4,11 @@
 #include "Utilities.h"
 
 /**
+* @brief 测试main函数（主程序）入参
+*/
+void test_argInMain(int argc, char* argv[]);
+
+/**
 * @brief 测试cout输出浮点数
 */
 void test_coutFloat();

@@ -5,8 +5,9 @@
 
 
 
-void main()
+int main(int argc, char* argv[])
 {
+	//test_argInMain(argc, argv);
 	//test_coutFloat();
 	//test_coutText();
 	//test_clock();
@@ -61,5 +62,7 @@ void main()
 	//SetConsoleCP(65001);
 	qDebug() << QString("给个第三方") << endl;
 	qDebug() << QString("给个第三方").toUtf8() << endl;
+
+	return 0;
 }
 

@@ -1,6 +1,31 @@
 #include "stdafx.h"
 #include "TestUtilities.h"
 
+void test_argInMain(int argc, char* argv[])
+{
+	/// 打印块信息
+	printBlockInfo("test_argInMain()");
+
+	/// 如果argc=1，说明main函数入参的个数为1，且系统默认入参个数也为1（这个默认参数即是所在路径）
+	/// argv[argc]为NULL空指针 
+	/// argv[0]指向程序运行的全路径名(若已经确认路径则打印其可执行程序的全名)
+	/// argv[1]指向在DOS命令行中用户输入程序中的第1个字符串
+	/// argv[2]指向在DOS命令行中用户输入程序中的第2个字符串
+	/// argv[i]指向在DOS命令行中用户输入程序中的第i个字符串 i=1...(argc-1)
+	if (argc > 0)
+	{
+		cout << "The number of arguments passed to the \"int main();\": " << argc << endl;
+		for (int i = 0; i < argc; i++) {
+			cout << "argv[" << i << "]: " << argv[i] << endl;
+		}
+	}
+	else
+	{
+		cout << "Error!" << endl;
+	}
+
+}
+
 void test_coutFloat()
 {
 	/// 打印块信息

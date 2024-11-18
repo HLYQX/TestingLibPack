@@ -58,4 +58,19 @@ void test_HDF5ReadCppArray();
 */
 void test_HDF5ReadEigen();
 
+/**
+* @brief 测试Qt写xml文件
+*/
+void test_QtXmlWrite();
+
+/**
+* @brief 测试Qt读xml文件
+*/
+void test_QtXmlRead();
+
+/**
+* @brief 测试Qt修改xml文件
+*/
+void test_QtXmlModify();
+
 #endif

@@ -18,10 +18,9 @@ void main()
 	//test_HDF5WriteMatrixXd();
 	//test_HDF5ReadCppArray();
 	//test_HDF5ReadEigen();
-
-
-
-
+	//test_QtXmlWrite();
+	//test_QtXmlRead();
+	//test_QtXmlModify();
 
 
 	//Test QString W

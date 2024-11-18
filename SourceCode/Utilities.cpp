@@ -127,3 +127,17 @@ Matrix<double, Dynamic, Dynamic, Eigen::RowMajor> transformStorageOrder(const Ma
 		return B;
 	}
 }
+
+string eigenMatrix2StdString(const MatrixXd& A, const Eigen::IOFormat Format)
+{
+	ostringstream OSS;
+	OSS << A.format(Format);
+	return OSS.str();
+}
+
+QString eigenMatrix2QString(const MatrixXd& A, const Eigen::IOFormat Format)
+{
+	ostringstream OSS;
+	OSS << A.format(Format);
+	return QString::fromStdString(OSS.str());
+}

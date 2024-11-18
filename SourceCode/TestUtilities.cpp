@@ -718,6 +718,9 @@ void test_HDF5ReadCppArray()
 
 	/// 关闭文件
 	H5FileRead.close();
+
+	/// 释放空间
+	delete[] H5Dims;
 }
 
 void test_HDF5ReadEigen()
@@ -767,7 +770,6 @@ void test_HDF5ReadEigen()
 	Matrix<double, Dynamic, Dynamic, Eigen::RowMajor> DataReadMatrixRowMajor(H5Dims[0], H5Dims[1]);
 	DataReadMatrixRowMajor.setZero();
 
-
 	/// 读取数据
 	H5DataSet.read(DataReadMatrixColMajor.data(), H5DataType);
 	H5DataSet.read(DataReadMatrixRowMajor.data(), H5DataType);
@@ -779,5 +781,181 @@ void test_HDF5ReadEigen()
 
 	/// 关闭文件
 	H5FileRead.close();
+
+	/// 释放空间
+	delete[] H5Dims;
+}
+
+void test_QtXmlWrite()
+{
+	/// 打印块信息
+	printBlockInfo("test_QtXmlWrite()");
+
+	/// Xml文件名
+	QString XmlName = QString("test_QtXmlWrite") + QString(".xml");
+	QFile XmlFile(XmlName);
+	XmlFile.open(QIODevice::WriteOnly);///< 只写模式
+
+	/// 创建Xml文件节点
+	QDomDocument DocXml;
+
+	/// 创建Xml说明
+	QDomProcessingInstruction InsXml;
+	InsXml = DocXml.createProcessingInstruction("xml", "version=\"1.0\" encoding=\"UTF-8\"");
+
+	///将Xml说明追加到父节点
+	DocXml.appendChild(InsXml);
+
+	/// 创建根节点
+	QDomElement RootEle = DocXml.createElement("RootEle");
+	DocXml.appendChild(RootEle);
+
+	/// 创建子节点1
+	QDomElement ChildEle1 = DocXml.createElement("ChildEle1");
+	ChildEle1.setAttribute("Self_Double", 1.10);
+	ChildEle1.setAttribute("Self_QString::number", QString::number(1.10));
+	RootEle.appendChild(ChildEle1);
+
+	/// 创建子子节点1
+	QDomElement ChildChildEle1 = DocXml.createElement("ChildChildEle1");
+	ChildChildEle1.setAttribute("Self_string", "ChildChildEle1");
+	ChildChildEle1.appendChild(DocXml.createTextNode("This is ChildChild 1"));
+	ChildEle1.appendChild(ChildChildEle1);
+
+	/// 创建子节点2
+	QDomElement ChildEle2 = DocXml.createElement("ChildEle2");
+	ChildEle2.setAttribute("TobeModified", "HasNotBeenModified");
+	ChildEle2.appendChild(DocXml.createTextNode("This is Child 2"));
+	RootEle.appendChild(ChildEle2);
+
+	/// 创建Eigen写入节点
+	QDomElement ChildEleEigen = DocXml.createElement("ChildEleEigen");
+	ChildEleEigen.setAttribute("Self", "eigenMatrix");
+	ChildEleEigen.setAttribute("Self.rows", "3");
+	ChildEleEigen.setAttribute("Self.cols", "3");
+	MatrixXd Mat = M_PI * MatrixXd::Identity(3, 3);
+	//Mat(1, 1) = 0;
+	//VectorXd Mat = M_PI * VectorXd::Unit(3, 3);
+	ChildEleEigen.appendChild(DocXml.createTextNode(eigenMatrix2QString(Mat)));
+	RootEle.appendChild(ChildEleEigen);
+
+	/// 写入文件
+	QTextStream QTStream(&XmlFile); ///< 文本流关联文件
+	DocXml.save(QTStream, 4); ///<4 缩进字符
+	XmlFile.close();
+}
+
+void test_QtXmlRead()
+{
+	/// 打印块信息
+	printBlockInfo("test_QtXmlRead()");
+
+	/// Xml文件名
+	QString XmlName = QString("test_QtXmlWrite") + QString(".xml");
+	QFile XmlFile(XmlName);
+	XmlFile.open(QIODevice::ReadOnly);///<仅读模式
+
+	/// 创建Xml文件节点
+	QDomDocument DocXml;
+
+	/// 将文件内容关联到（写入）Xml文件节点变量
+	DocXml.setContent(&XmlFile);
+
+	/// 得到根节点
+	QDomElement RootEle = DocXml.documentElement();
+
+
+	/// 找到子节点1并打印
+	/// 方法一：找第一个
+	QDomElement ChildEle1 = RootEle.firstChildElement("ChildEle1");
+	cout << "ChildEle1: " << ChildEle1.attribute("Self_Double").toStdString() << endl;
+	cout << "ChildEle1: " << ChildEle1.attribute("Self_QString::number").toStdString() << endl;
+	/// 方法二：找到所有，取第一个
+	QDomElement ChildEle1_Copy = RootEle.elementsByTagName("ChildEle1").at(0).toElement();
+	cout << "ChildEle1: " << ChildEle1_Copy.attribute("Self_Double").toStdString() << endl;
+	cout << "ChildEle1: " << ChildEle1_Copy.attribute("Self_QString::number").toStdString() << endl;
+
+	/// 找到子子节点1并打印
+	QDomElement ChildChildEle1 = ChildEle1.firstChildElement("ChildChildEle1");
+	cout << "ChildChildEle1: " << ChildChildEle1.attribute("Self_string").toStdString() << endl;
+	cout << "ChildChildEle1: " << ChildChildEle1.text().toStdString() << endl;
+
+	/// 找到子节点2并打印
+	QDomElement ChildEle2 = RootEle.firstChildElement("ChildEle2");
+	/// 可打印节点名称
+	cout << ChildEle2.tagName().toStdString() << endl;
+	cout << "ChildEle2: " << ChildEle2.attribute("TobeModified").toStdString() << endl;
+	cout << "ChildEle2: " << ChildEle2.text().toStdString() << endl;
+
+	/// 找到Eigen子节点并打印
+	QDomElement ChildEleEigen = RootEle.firstChildElement("ChildEleEigen");
+	cout << "ChildEleEigen: " << ChildEleEigen.attribute("Self").toStdString() << endl;
+	cout << "ChildEleEigen: " << ChildEleEigen.attribute("Self.rows").toInt() << endl;
+	cout << "ChildEleEigen: " << ChildEleEigen.attribute("Self.cols").toInt() << endl;
+	cout << "ChildEleEigen: " << ChildEleEigen.text().toStdString() << endl;
+
+	/// 将xml的内容存入Eigen
+	MatrixXd Mat(ChildEleEigen.attribute("Self.rows").toInt(), ChildEleEigen.attribute("Self.cols").toInt());
+	for (int i = 0; i < Mat.rows(); i++)
+	{
+		for (int j = 0; j < Mat.cols(); j++)
+		{
+			Mat(i, j) = (ChildEleEigen.text().split(','))[i * Mat.cols() + j].toDouble();
+		}
+	}
+
+	cout << "Mat:\n" << Mat << endl;
+
+	/// 关闭文件
+	XmlFile.close();
+}
+
+void test_QtXmlModify()
+{
+	/// 打印块信息
+	printBlockInfo("test_QtXmlModify()");
+
+	/// Xml文件名
+	QString XmlName = QString("test_QtXmlWrite") + QString(".xml");
+	QFile XmlFile(XmlName);
+	/// 先读再写完成“修改”
+	XmlFile.open(QIODevice::ReadOnly);///<仅读模式(读取信息)
+
+	/// 创建Xml文件节点
+	QDomDocument DocXml;
+
+	/// 将文件内容关联到（写入）Xml文件节点变量
+	DocXml.setContent(&XmlFile);
+	/// 读取结束，关闭文件
+	XmlFile.close();
+
+	/// 得到根节点
+	QDomElement RootEle = DocXml.documentElement();
+
+	/// 得到子节点2
+	QDomElement ChildEle2 = RootEle.firstChildElement("ChildEle2");
+
+	/// 修改属性
+	ChildEle2.setAttribute("TobeModified", "HasBeenModified");
+	/// 修改节点值
+	ChildEle2.firstChild().setNodeValue("This is Child 2 but has been modified");
+
+	/// 得到并移除Eigen节点
+	QDomElement ChildEleEigen = RootEle.firstChildElement("ChildEleEigen");
+	RootEle.removeChild(ChildEleEigen);
+
+	/// 可修改xml说明,同时可把其中的单引号强制换为双引号
+	if (DocXml.firstChild().isProcessingInstruction())
+	{
+		DocXml.firstChild().setNodeValue("version=\"2.0\" encoding=\"UTF-8\"");
+	}
+
+	/// 写入文件
+	XmlFile.open(QIODevice::WriteOnly | QIODevice::Truncate);///<仅写模式
+	QTextStream QTStream(&XmlFile); ///<文本流关联文件
+	DocXml.save(QTStream, 4); ///<4 缩进字符
+
+	/// 关闭文件
+	XmlFile.close();
 }
 

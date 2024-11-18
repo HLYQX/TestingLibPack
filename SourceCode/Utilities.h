@@ -42,4 +42,18 @@ void printBlockInfo(const string& BlockName);
 */
 Matrix<double, Dynamic, Dynamic, Eigen::RowMajor> transformStorageOrder(const MatrixXd& A);
 
+/**
+* @brief Eigen矩阵转std:string
+* @param [A]  待转换的MatrixXd
+* @param [Format]  待转换的矩阵的格式Eigen::IOFormat
+*/
+string eigenMatrix2StdString(const MatrixXd& A, const Eigen::IOFormat Format = IOFormat(-1, 0, ",", ","));
+
+/**
+* @brief Eigen矩阵转QString
+* @param [A]  待转换的MatrixXd
+* @param [Format]  待转换的矩阵的格式Eigen::IOFormat
+*/
+QString eigenMatrix2QString(const MatrixXd& A, const Eigen::IOFormat Format = IOFormat(-1, 0, ",", ","));
+
 #endif
